@@ -14,7 +14,7 @@ func main() {
 		fmt.Println(searchDef)
 	}
 
-	addErr := dictionary.Add("키", "180")
+	addErr := dictionary.Add("키", "165")
 	if addErr != nil {
 		fmt.Println(addErr)
 	}
@@ -24,4 +24,13 @@ func main() {
 	} else {
 		fmt.Println(searchDef1)
 	}
+
+	updateErr := dictionary.Update("키", "180")
+	if updateErr != nil {
+		fmt.Println(updateErr)
+	} else {
+		searchDef2, _ := dictionary.Search("키")
+		fmt.Println(searchDef2)
+	}
+
 }
