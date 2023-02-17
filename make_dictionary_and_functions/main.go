@@ -32,5 +32,11 @@ func main() {
 		searchDef2, _ := dictionary.Search("키")
 		fmt.Println(searchDef2)
 	}
-
+	dictionary.Delete("키")
+	searchDef2, searchErr2 := dictionary.Search("키")
+	if searchErr2 != nil {
+		fmt.Println(searchErr2)
+	} else {
+		fmt.Println(searchDef2)
+	}
 }
