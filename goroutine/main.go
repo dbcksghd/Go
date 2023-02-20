@@ -13,8 +13,8 @@ func what() {
 }
 
 func main() {
-	what()
 	go what()
+	what()
 	go what()
 	time.Sleep(time.Second * 5)
 }
