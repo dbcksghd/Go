@@ -6,6 +6,11 @@ import (
 	"net/http"
 )
 
+type request struct {
+	url    string
+	status string
+}
+
 var errRequestFailed = errors.New("불러오기 실패")
 
 func main() {
