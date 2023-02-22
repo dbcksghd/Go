@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type request struct {
+type requestResult struct {
 	url    string
 	status string
 }
@@ -16,6 +16,7 @@ var errRequestFailed = errors.New("불러오기 실패")
 func main() {
 
 	var results = make(map[string]string)
+	ch := make(chan requestResult)
 	urls := []string{
 		"https://www.naver.com/",
 		"https://www.youtube.com/",
@@ -25,24 +26,24 @@ func main() {
 	}
 
 	for _, url := range urls {
-		fmt.Println(url + "확인 중...")
-		result := "성공"
-		err := hitURL(url)
-		if err != nil {
-			result = "실패"
-		}
-		results[url] = result
+		go hitURL(url, ch)
 	}
-	for url, res := range results {
-		fmt.Println(url, res)
+
+	for i := 0; i < len(urls); i++ {
+		result := <-ch
+		results[result.url] = result.status
+
+	}
+	for url, status := range results {
+		fmt.Println(url, status)
 	}
 }
 
-func hitURL(url string) error {
+func hitURL(url string, ch chan<- requestResult) {
 	res, err := http.Get(url)
+	status := "성공"
 	if err != nil || res.StatusCode >= 400 {
-		fmt.Println(err, res.StatusCode)
-		return errRequestFailed
+		status = "실패"
 	}
-	return nil
+	ch <- requestResult{url: url, status: status}
 }
