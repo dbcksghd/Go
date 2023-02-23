@@ -12,6 +12,10 @@ func main() {
 		fmt.Fprintln(w, "welcome!")
 	})
 
+	http.HandleFunc("/what", func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintln(writer, "what")
+	})
+
 	// 8080 포트로 웹 서버 구동
 	http.ListenAndServe(":8080", nil)
 }
