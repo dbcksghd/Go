@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+var baseURL string = "https://kr.indeed.com/jobs?q=flutter&limit=50"
 
 func main() {
-	fmt.Println("djawnstlr")
+
 }
