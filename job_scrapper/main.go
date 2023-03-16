@@ -2,22 +2,30 @@ package main
 
 import (
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
 )
 
-var baseURL string = "https://www.google.com/search?q=flutter&rlz=1C5CHFA_enKR1035KR1035&oq=flutter&aqs=chrome..69i57j69i59l3j69i60l4.3615j0j4&sourceid=chrome&ie=UTF-8"
+var baseURL string = "https://github.com/search?q=what&type=users"
 
 func main() {
-	pages := getPages()
-	fmt.Println(pages)
+	totalPages := getPages()
+	fmt.Println(totalPages)
 }
 
 func getPages() int {
+	pages := 0
 	response, errorMessage := http.Get(baseURL)
 	checkErr(errorMessage)
 	checkStatusCode(response)
-	return 0
+	document, errorM := goquery.NewDocumentFromReader(response.Body)
+	checkErr(errorM)
+	document.Find(".codesearch-pagination-container").Each(func(i int, selection *goquery.Selection) {
+		pages = selection.Find("a").Length()
+	})
+	defer response.Body.Close() // 함수가 끝났을 때 실행할꺼
+	return pages
 }
 
 func checkErr(errorMessage error) {
