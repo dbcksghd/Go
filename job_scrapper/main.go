@@ -1,25 +1,44 @@
 package main
 
 import (
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
 	"strconv"
 )
 
-var baseURL string = "https://browse.auction.co.kr/search?keyword=%EB%A7%A5%EB%B6%81&k=31"
+type extractedJob struct {
+	id       string
+	location string
+	title    string
+	salary   string
+	summary  string
+}
+
+var baseURL string = "https://kr.indeed.com/jobs?q=python&limit=50"
 
 func main() {
 	totalPages := getPages()
-	for i := 1; i <= totalPages; i++ {
+	for i := 0; i < totalPages; i++ {
 		getPage(i)
 	}
 }
 
 func getPage(page int) {
-	pageURL := baseURL + "&p=" + strconv.Itoa(page)
-	fmt.Println(pageURL)
+	pageURL := baseURL + "&start" + strconv.Itoa(page*50)
+	response, errorMessage := http.Get(pageURL)
+	checkErr(errorMessage)
+	checkStatusCode(response)
+	document, err := goquery.NewDocumentFromReader(response.Body)
+	checkErr(err)
+	defer response.Body.Close()
+
+	searchCards := document.Find(".jobsearch-SerpJobCard")
+	searchCards.Each(func(i int, selection *goquery.Selection) {
+		id, _ := selection.Attr("data-jk")
+		title := selection.Find(".title>a").Text()
+		location := selection.Find(".sjcl").Text()
+	})
 }
 
 func getPages() int {
@@ -29,7 +48,7 @@ func getPages() int {
 	checkStatusCode(response)
 	document, err := goquery.NewDocumentFromReader(response.Body)
 	checkErr(err)
-	document.Find(".component--pagination").Each(func(i int, selection *goquery.Selection) {
+	document.Find(".pagination").Each(func(i int, selection *goquery.Selection) {
 		pages = selection.Find("a").Length()
 	})
 	defer response.Body.Close()
