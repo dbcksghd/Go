@@ -5,13 +5,21 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
+	"strconv"
 )
 
-var baseURL string = "https://github.com/search?q=what&type=users"
+var baseURL string = "https://browse.auction.co.kr/search?keyword=%EB%A7%A5%EB%B6%81&k=31"
 
 func main() {
 	totalPages := getPages()
-	fmt.Println(totalPages)
+	for i := 1; i <= totalPages; i++ {
+		getPage(i)
+	}
+}
+
+func getPage(page int) {
+	pageURL := baseURL + "&p=" + strconv.Itoa(page)
+	fmt.Println(pageURL)
 }
 
 func getPages() int {
@@ -19,12 +27,12 @@ func getPages() int {
 	response, errorMessage := http.Get(baseURL)
 	checkErr(errorMessage)
 	checkStatusCode(response)
-	document, errorM := goquery.NewDocumentFromReader(response.Body)
-	checkErr(errorM)
-	document.Find(".codesearch-pagination-container").Each(func(i int, selection *goquery.Selection) {
+	document, err := goquery.NewDocumentFromReader(response.Body)
+	checkErr(err)
+	document.Find(".component--pagination").Each(func(i int, selection *goquery.Selection) {
 		pages = selection.Find("a").Length()
 	})
-	defer response.Body.Close() // 함수가 끝났을 때 실행할꺼
+	defer response.Body.Close()
 	return pages
 }
 
