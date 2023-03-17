@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type extractedJob struct {
@@ -36,8 +38,9 @@ func getPage(page int) {
 	searchCards := document.Find(".jobsearch-SerpJobCard")
 	searchCards.Each(func(i int, selection *goquery.Selection) {
 		id, _ := selection.Attr("data-jk")
-		title := selection.Find(".title>a").Text()
-		location := selection.Find(".sjcl").Text()
+		title := cleanString(selection.Find(".title>a").Text())
+		location := cleanString(selection.Find(".sjcl").Text())
+		fmt.Println(id, title, location)
 	})
 }
 
@@ -65,4 +68,8 @@ func checkStatusCode(response *http.Response) {
 	if response.StatusCode != 200 {
 		log.Fatalln("에러코드 : ", response.StatusCode) // 200이 아니여도 프로그램 끝내기
 	}
+}
+
+func cleanString(str string) string {
+	return strings.Join(strings.Fields(strings.TrimSpace(str)), "")
 }
