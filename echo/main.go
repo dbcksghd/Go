@@ -1,7 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"github.com/labstack/echo/v4"
+	"net/http"
+)
 
 func main() {
-	fmt.Println("현석이가 알려주는 echo로 게시판 만들기")
+	e := echo.New()
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello world!")
+	})
+	e.Logger.Fatal(e.Start(":8080"))
 }
