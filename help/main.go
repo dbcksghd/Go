@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/labstack/echo/v4"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -39,91 +41,61 @@ func main() {
 		return c.String(200, "what")
 	})
 
-	e.GET("/unfollowing", func(c echo.Context) error {
-		m := make(map[string]int)
-		followerCh := make(chan User)
-		followingCh := make(chan User)
-
-		userName := c.QueryParam("userName")
-
-		go getFollowingUserList(userName, followingCh)
-		go getFollowerUserList(userName, followerCh)
-		var list []User
-		for user := range followingCh {
-			m[user.Login] = 1
-		}
-		for user := range followerCh {
-			if m[user.Login] != 1 {
-				list = append(list, user)
-			}
-		}
-		return c.JSON(200, list)
-	})
+	//e.GET("/unfollowing", func(c echo.Context) error {
+	//	m := make(map[string]int)
+	//	followerCh := make(chan []User)
+	//	followingCh := make(chan []User)
+	//
+	//	userName := c.QueryParam("userName")
+	//
+	//	getFollowingUserList(userName, followingCh)
+	//	getFollowerUserList(userName, followerCh)
+	//	var list []User
+	//	list <- followingCh
+	//	for user := range followingCh {
+	//		m[user] = 1
+	//	}
+	//	for user := range followerCh {
+	//		if m[user.Login] != 1 {
+	//			list = append(list, user)
+	//		}
+	//	}
+	//	return c.JSON(200, list)
+	//})
 
 	e.GET("/unfollower", func(c echo.Context) error {
 		m := make(map[string]int)
 		followerCh := make(chan []User)
 		followingCh := make(chan []User)
+		//userSet1Ch := make(chan User)
 		userName := c.QueryParam("userName")
-		go getFollowingUserList(userName, followingCh)
-		go getFollowerUserList(userName, followerCh)
+		getFollowUserList(userName, "folowing", followingCh)
+		getFollowUserList(userName, "followers", followerCh)
 
-		var list []User
-		users := <-followerCh
-		for user := range followerCh {
-			go func() {
-				m[user.Login] = 1
-			}()
+		list := <-followingCh
+		for i, user := range list {
+			go userSet1(user, m, i)
 		}
-		for user := range followingCh {
-			if m[user.Login] != 1 {
-				list = append(list, user)
-			}
-		}
-		return c.JSON(200, list)
+		//for user := range followingCh {
+		//	if m[user.Login] != 1 {
+		//		list = append(list, user)
+		//	}
+		//}
+		//return c.JSON(200, list)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
-// 내가 팔로잉한 사람들을 긁어오는 함수
-func getFollowingUserList(userName string, ch chan<- []User) {
-	for i := 1; ; i++ {
-		pageURL := baseurl + userName + "/following?per_page=100&page=" + strconv.Itoa(i)
-		req, err := http.NewRequest("GET", pageURL, nil)
-		if err != nil {
-			panic(err)
-		}
-
-		req.Header.Set("Authorization", "Bearer"+token)
-		client := &http.Client{}
-
-		res, err := client.Do(req)
-		if err != nil {
-			panic(err)
-		}
-
-		body, err := ioutil.ReadAll(res.Body)
-		var following []User
-		err = json.Unmarshal(body, &following)
-		if err != nil {
-			log.Fatalf("Failed to decode following: %v", err)
-		}
-		for _, user := range following {
-			ch <- user
-		}
-
-		if len(following) < 100 {
-			break
-		}
-	}
-	close(ch)
+func userSet1(user User, m map[string]int, i int) {
+	m[user.Login] = 1
+	fmt.Println(i)
 }
 
-// 내 팔로워를 모두 가져오는 함수
-func getFollowerUserList(userName string, ch chan []User) {
+// 내가 팔로잉한 사람들을 긁어오는 함수
+func getFollowUserList(userName string, follow string, ch chan<- []User) {
 	for i := 1; ; i++ {
-		pageURL := baseurl + userName + "/followers?per_page=100&page=" + strconv.Itoa(i)
+		pageURL := baseurl + userName + "/" + follow + "?per_page=100&page=" + strconv.Itoa(i)
 		req, err := http.NewRequest("GET", pageURL, nil)
 		if err != nil {
 			panic(err)
@@ -143,9 +115,7 @@ func getFollowerUserList(userName string, ch chan []User) {
 		if err != nil {
 			log.Fatalf("Failed to decode following: %v", err)
 		}
-		for _, user := range following {
-			ch <- user
-		}
+		ch <- following
 
 		if len(following) < 100 {
 			break
