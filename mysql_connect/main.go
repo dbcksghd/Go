@@ -12,4 +12,13 @@ func main() {
 	}
 	defer db.Close()
 
+	var (
+		name     string
+		birthday string
+	)
+	var userId int
+	err = db.QueryRow("SELECT * FROM user").Scan(&userId, &name, &birthday)
+	if err != nil {
+		panic(err)
+	}
 }
