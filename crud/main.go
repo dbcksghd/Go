@@ -64,4 +64,15 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	//DELETE
+	deleteUser := User{
+		UserId:   1234,
+		Name:     "유찬홍",
+		Birthday: "20061206",
+	}
+	_, err = db.Exec("DELETE FROM user WHERE user_id=?", deleteUser.UserId)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
