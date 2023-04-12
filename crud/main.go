@@ -52,4 +52,16 @@ func main() {
 	for _, user := range users { //유저 리스트 돌면서 가져온 값 다 출력해주기
 		fmt.Println(user.UserId, user.Name, user.Birthday)
 	}
+
+	//UPDATE
+	updateUser := User{
+		UserId:   1235,
+		Name:     "이정호",
+		Birthday: "20061209",
+	} //업뎃할 유저
+	_, err = db.Exec("UPDATE user SET name = ?, birthday = ? WHERE user_id=?",
+		updateUser.Name, updateUser.Birthday, updateUser.UserId)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
