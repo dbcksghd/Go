@@ -11,10 +11,13 @@ func main() {
 	e.POST("/signin", func(c echo.Context) error {
 		email := c.QueryParam("email")
 		pwd := c.QueryParam("password")
+		if i := m[email]; i != "" {
+			return c.JSON(202, "이미 있음")
+		}
 		m[email] = pwd
 		val, isTrue := m[email]
 		defer fmt.Println(val, isTrue) //잘 출력해줌 !!
-		return c.NoContent(200)
+		return c.NoContent(201)
 	})
 	e.Logger.Fatal(e.Start(":8080"))
 }
