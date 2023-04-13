@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"github.com/labstack/echo/v4"
+)
 
 func main() {
-	fmt.Println("what")
+	e := echo.New()
+	e.GET("/", func(c echo.Context) error {
+		return c.JSON(200, "what")
+	})
+	e.Logger.Fatal(e.Start(":8080"))
 }
