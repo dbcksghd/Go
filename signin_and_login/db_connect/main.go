@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
 	"os"
@@ -32,6 +33,20 @@ func main() {
 		if err != nil {
 			return c.NoContent(204)
 		}
+		return c.NoContent(200)
+	})
+
+	e.GET("/signin", func(c echo.Context) error {
+		user := User{}
+		user.id = c.QueryParam("userId")
+		user.password = c.QueryParam("userPassword")
+		err = db.QueryRow("SELECT * from user WHERE user_id = ? AND password = ?", user.id, user.password).
+			Scan(&user.name, &user.id, &user.password)
+		if err != nil {
+			fmt.Println("아이디나 비밀번호가 일치하지 않습니다.")
+			return c.NoContent(204)
+		}
+		fmt.Println(user.name)
 		return c.NoContent(200)
 	})
 
