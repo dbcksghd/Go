@@ -1,9 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
+	"os"
 )
 
 func main() {
-	fmt.Println("what")
+	password := os.Getenv("PASSWORD")
+	db, err := sql.Open("mysql", "root:"+password+"@tcp(localhost:3306)/test")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 }
