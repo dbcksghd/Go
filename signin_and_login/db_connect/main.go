@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/labstack/echo/v4"
 	"os"
 )
 
@@ -13,7 +14,7 @@ type User struct {
 }
 
 func main() {
-	
+	e := echo.New()
 	password := os.Getenv("PASSWORD")
 	db, err := sql.Open("mysql", "root:"+password+"@tcp(localhost:3306)/test")
 	if err != nil {
@@ -27,4 +28,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	e.Logger.Fatal(e.Start(":8080"))
 }
