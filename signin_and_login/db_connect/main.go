@@ -5,6 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
 	"os"
+	"strconv"
 )
 
 type User struct {
@@ -21,13 +22,18 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
-
-	newUser := User{user_id: 1265, name: "강민", birthday: "20060629"}
-	_, err = db.Exec("INSERT INTO user (name, user_id, birthday) VALUES (?, ?, ?)",
-		newUser.name, newUser.user_id, newUser.birthday)
-	if err != nil {
-		panic(err)
-	}
+	e.POST("/signup", func(c echo.Context) error {
+		newUser := User{}
+		newUser.name = c.QueryParam("userName")
+		newUser.user_id, _ = strconv.Atoi(c.QueryParam("userId"))
+		newUser.birthday = c.QueryParam("userBirthday")
+		_, err = db.Exec("INSERT INTO user (name, user_id, birthday) VALUES (?, ?, ?)",
+			newUser.name, newUser.user_id, newUser.birthday)
+		if err != nil {
+			return c.NoContent(204)
+		}
+		return c.NoContent(200)
+	})
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
