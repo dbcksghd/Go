@@ -5,13 +5,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
 	"os"
-	"strconv"
 )
 
 type User struct {
 	name     string
-	user_id  int
-	birthday string
+	id       string
+	password string
 }
 
 func main() {
@@ -22,13 +21,14 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
+
 	e.POST("/signup", func(c echo.Context) error {
 		newUser := User{}
 		newUser.name = c.QueryParam("userName")
-		newUser.user_id, _ = strconv.Atoi(c.QueryParam("userId"))
-		newUser.birthday = c.QueryParam("userBirthday")
-		_, err = db.Exec("INSERT INTO user (name, user_id, birthday) VALUES (?, ?, ?)",
-			newUser.name, newUser.user_id, newUser.birthday)
+		newUser.id = c.QueryParam("userId")
+		newUser.password = c.QueryParam("userPassword")
+		_, err = db.Exec("INSERT INTO user (user_name, user_id, password) VALUES (?, ?, ?)",
+			newUser.name, newUser.id, newUser.password)
 		if err != nil {
 			return c.NoContent(204)
 		}
