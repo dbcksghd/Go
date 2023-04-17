@@ -1,5 +1,9 @@
 package main
 
+import (
+	"os"
+)
+
 type GraphqlRequest struct {
 	Query string `json:"query"`
 }
@@ -25,5 +29,28 @@ type GraphqlResponse struct {
 }
 
 func main() {
-	
+	token := os.Getenv("TOKEN")
+
+	url := "https://api.github.com/graphql"
+
+	query := `query {
+		user(login: "yoochanhong") {
+				following(first: 100) {
+					nodes {
+					login
+					name
+					avatarUrl
+					}
+				}
+				followers(first: 100) {
+					nodes {
+					login
+					name
+					avatarUrl
+					}
+				}
+			}
+		}
+	`
+
 }
