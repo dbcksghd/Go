@@ -83,4 +83,19 @@ func main() {
 		return
 	}
 	defer resp.Body.Close()
+
+	var graphqlResponse GraphqlResponse
+	err = json.NewDecoder(resp.Body).Decode(&graphqlResponse)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Following:")
+	for _, user := range graphqlResponse.Data.User.Following.Nodes {
+		fmt.Println(user.Login)
+	}
+	fmt.Println("Followers:")
+	for _, user := range graphqlResponse.Data.User.Followers.Nodes {
+		fmt.Println(user.Login)
+	}
 }
