@@ -1,13 +1,29 @@
 package main
 
-import "fmt"
+type GraphqlRequest struct {
+	Query string `json:"query"`
+}
 
-type GithubUser struct {
-	Login     string `json:"login"`
-	AvatarURL string `json:"avatar_url"`
-	HTMLURL   string `json:"html_url"`
+type GraphqlResponse struct {
+	Data struct {
+		User struct {
+			Name      string `json:"name"`
+			Following struct {
+				Nodes []struct {
+					Login   string `json:"login"`
+					HtmlUrl string `json:"html_url"`
+				} `json:"nodes"`
+			} `json:"following"`
+			Followers struct {
+				Nodes []struct {
+					Login   string `json:"login"`
+					HtmlUrl string `json:"html_url"`
+				} `json:"nodes"`
+			} `json:"followers"`
+		} `json:"user"`
+	} `json:"data"`
 }
 
 func main() {
-	fmt.Println("what")
+	
 }
