@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -53,4 +55,14 @@ func main() {
 		}
 	`
 
+	requestBody := &GraphqlRequest{
+		Query: query,
+	}
+
+	jsonBody, err := json.Marshal(requestBody)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	
 }
