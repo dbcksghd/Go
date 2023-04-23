@@ -1,10 +1,8 @@
 package main
 
-import "github.com/labstack/echo/v4"
+import "os"
 
 func main() {
-
-	e := echo.New()
-
-	e.Logger.Fatal(e.Start(":8080"))
+	client_id := os.Getenv("client_id")
+	client_secrets := os.Getenv("client_secrets")
 }
