@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
@@ -24,6 +25,15 @@ func main() {
 	e.GET("/login", func(c echo.Context) error {
 		url := githubConfig.AuthCodeURL("state")
 		return c.Redirect(http.StatusTemporaryRedirect, url)
+	})
+
+	e.GET("/callback", func(c echo.Context) error {
+		code := c.QueryParam("code")
+		accessToken, err := githubConfig.Exchange(context.Background(), code)
+		if err != nil {
+			panic(err)
+		}
+		return c.JSON(200, accessToken)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
