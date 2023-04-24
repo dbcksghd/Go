@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
 	"time"
 )
@@ -21,4 +22,11 @@ func main() {
 			ExpiresAt: jwt.At(time.Now().Add(time.Hour)),
 		},
 	}
+
+	tcToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tc)
+	accessToken, err := tcToken.SignedString([]byte("qlalfzl"))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(accessToken)
 }
