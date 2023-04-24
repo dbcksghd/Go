@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
 	"time"
@@ -29,4 +30,18 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(accessToken)
+
+	//복호화
+	claims := TokenClaims{}
+	key := func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("잘못됨")
+		}
+		return []byte("qlalfzl"), nil
+	}
+	token, err := jwt.ParseWithClaims(accessToken, &claims, key)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%t\n%#v", token.Valid, claims)
 }
