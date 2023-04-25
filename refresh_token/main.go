@@ -20,9 +20,10 @@ type LoginResponse struct {
 
 func main() {
 	m := make(map[string]string)
+	//rfm := make(map[string]string)
 	e := echo.New()
 
-	e.GET("/signup", func(c echo.Context) error {
+	e.POST("/signup", func(c echo.Context) error {
 		id := c.QueryParam("id")
 		password := c.QueryParam("password")
 
@@ -33,7 +34,7 @@ func main() {
 		return c.NoContent(200)
 	})
 
-	e.GET("/signin", func(c echo.Context) error {
+	e.POST("/signin", func(c echo.Context) error {
 		id := c.QueryParam("id")
 		password := c.QueryParam("password")
 		if i := m[id]; i == password {
@@ -69,6 +70,17 @@ func main() {
 			return c.JSON(200, loginResponse)
 		}
 		return c.NoContent(404)
+	})
+
+	e.GET("/checkToken", func(c echo.Context) error {
+		accessToken := c.QueryParam("accessToken")
+		token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+			return []byte("qlalfzl"), nil
+		})
+		if !token.Valid || err != nil {
+			return c.NoContent(401)
+		}
+		return c.NoContent(200)
 	})
 	e.Logger.Fatal(e.Start(":8080"))
 }
