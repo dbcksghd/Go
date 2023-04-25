@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/labstack/echo/v4"
 	"time"
@@ -14,9 +13,9 @@ type TokenClaims struct {
 }
 
 type LoginResponse struct {
-	AccessToken  string `json : "access_token"`
-	Message      string `json : "message"`
-	RefreshToken string `json : "refresh_token"`
+	AccessToken  string `json:"access_token"`
+	Message      string `json:"message"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 func main() {
@@ -50,8 +49,24 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println(accessToken)
-			return c.JSON(200, "로그인에 성공하셨습니다!")
+			rf := TokenClaims{
+				UserID: id,
+				Role:   "user",
+				StandardClaims: jwt.StandardClaims{
+					ExpiresAt: jwt.At(time.Now().Add(time.Hour * 24)),
+				},
+			}
+			rfToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &rf)
+			refreshToken, err := rfToken.SignedString([]byte("qlalfzl"))
+			if err != nil {
+				panic(err)
+			}
+			loginResponse := LoginResponse{
+				AccessToken:  accessToken,
+				RefreshToken: refreshToken,
+				Message:      "로그인에 성공하셨습니다!",
+			}
+			return c.JSON(200, loginResponse)
 		}
 		return c.NoContent(404)
 	})
