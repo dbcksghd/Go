@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/labstack/echo/v4"
+	"time"
 )
 
 type TokenClaims struct {
@@ -30,6 +32,19 @@ func main() {
 		id := c.QueryParam("id")
 		password := c.QueryParam("password")
 		if i := m[id]; i == password {
+			tc := TokenClaims{
+				UserID: id,
+				Role:   "user",
+				StandardClaims: jwt.StandardClaims{
+					ExpiresAt: jwt.At(time.Now().Add(time.Minute)),
+				},
+			}
+			tcToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tc)
+			accessToken, err := tcToken.SignedString([]byte("qlalfzl"))
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println(accessToken)
 			return c.JSON(200, "로그인에 성공하셨습니다!")
 		}
 		return c.NoContent(404)
