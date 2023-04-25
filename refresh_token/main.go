@@ -1,6 +1,15 @@
 package main
 
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/dgrijalva/jwt-go/v4"
+	"github.com/labstack/echo/v4"
+)
+
+type TokenClaims struct {
+	UserID string `json:"id"`
+	Role   string `json:"role"`
+	jwt.StandardClaims
+}
 
 func main() {
 	m := make(map[string]string)
