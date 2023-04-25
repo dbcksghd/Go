@@ -83,5 +83,39 @@ func main() {
 		}
 		return c.NoContent(200)
 	})
+
+	e.GET("/checkRefreshToken", func(c echo.Context) error {
+		refreshToken := c.QueryParam("refreshToken")
+		token, err := jwt.ParseWithClaims(refreshToken, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+			return []byte("qlalfzl"), nil
+		})
+		//토큰 기간 만료 또는 에러
+		if !token.Valid || err != nil {
+			return c.NoContent(401)
+		}
+
+		//정의해둔 구조체에 맞게 파싱
+		claims, ok := token.Claims.(*TokenClaims)
+		if !ok {
+			return c.NoContent(401)
+		}
+		id := claims.UserID
+		//만약 id에 맞는 리프레시 토큰이 아니라면
+		if rf := rfm[id]; rf != refreshToken {
+			return c.NoContent(401)
+		}
+		tc := TokenClaims{
+			UserID: id,
+			Role:   "user",
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: jwt.At(time.Now().Add(time.Minute)),
+			},
+		}
+		tcToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tc)
+		accessToken, err := tcToken.SignedString([]byte("qlalfzl"))
+		return c.JSON(200, map[string]interface{}{
+			"access_token": accessToken,
+		})
+	})
 	e.Logger.Fatal(e.Start(":8080"))
 }
