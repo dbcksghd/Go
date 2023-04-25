@@ -20,7 +20,7 @@ type LoginResponse struct {
 
 func main() {
 	m := make(map[string]string)
-	//rfm := make(map[string]string)
+	rfm := make(map[string]string)
 	e := echo.New()
 
 	e.POST("/signup", func(c echo.Context) error {
@@ -62,6 +62,7 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
+			rfm[id] = refreshToken
 			loginResponse := LoginResponse{
 				AccessToken:  accessToken,
 				RefreshToken: refreshToken,
