@@ -13,6 +13,12 @@ type TokenClaims struct {
 	jwt.StandardClaims
 }
 
+type LoginResponse struct {
+	AccessToken  string `json : "access_token"`
+	Message      string `json : "message"`
+	RefreshToken string `json : "refresh_token"`
+}
+
 func main() {
 	m := make(map[string]string)
 	e := echo.New()
