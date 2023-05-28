@@ -7,6 +7,13 @@ import (
 	"os"
 )
 
+type User struct {
+	gorm.Model
+	Id       int
+	Name     string
+	birthday string
+}
+
 func main() {
 	password := os.Getenv("PASSWORD")
 	dsn := "root:" + password + "@tcp(localhost:3306)/test"
