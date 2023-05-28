@@ -21,6 +21,10 @@ func main() {
 		panic(err)
 	}
 	user := User{Id: 1206, Birthday: "20061206", Name: "유찬홍"}
-	db.Table("test.user").Create(&user)
-	fmt.Println("what")
+	db.Table("user").Create(&user)
+	var users []User
+	db.Table("user").First(&users, "Id = ?", "1206")
+	for _, i := range users {
+		fmt.Println(i.Id)
+	}
 }
